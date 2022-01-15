@@ -8,7 +8,9 @@ export default function Layout({
   return (
     <div>
       <Header></Header>
-      <div>{children}</div>
+      <div className="bg-zinc-800">
+        {children}
+      </div>
     </div>
   );
 };
