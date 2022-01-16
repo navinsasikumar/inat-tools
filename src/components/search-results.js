@@ -40,6 +40,18 @@ const SearchResults = () => {
     },
   };
 
+  const handleSelectedClick = (index, type, value) => {
+    switch (type) {
+      case 'taxa': {
+        const localSelectedTaxa = [...selectedTaxa];
+        localSelectedTaxa.splice(index, 1);
+        setSelectedTaxa(localSelectedTaxa);
+        break;
+      }
+      default:
+    } 
+  };
+
   useEffect(() => {
     async function fetchAPI() {
       const res = await axios.get(`${INAT_API_URL}/taxa/autocomplete?q=${taxaMatch}`)
@@ -91,6 +103,7 @@ const SearchResults = () => {
           selectedTaxa={selectedTaxa}
           typedValue={typedValue}
           handleSelectFns={handleSelectFns}
+          handleSelectedClick={handleSelectedClick}
         />
         <INatLinks queryStr={query} />
         <div className="w-full lg:flex items-center">

@@ -6,6 +6,7 @@ const SearchFilter = ({
   selectedTaxa,
   typedValue,
   handleSelectFns,
+  handleSelectedClick,
 }) => {
   return (
     <form className="pt-6 w-full">
@@ -17,6 +18,7 @@ const SearchFilter = ({
             selectedTaxa={selectedTaxa}
             typedValue={typedValue.taxon}
             handleSelectFn={handleSelectFns.taxa}
+            handleSelectedClick={handleSelectedClick}
           />
         </div> 
       </div>

@@ -36,7 +36,7 @@ const SelectedFilters = ({
 
   return (
     <div
-      className="border-gray-600 border-[1px] border-solid inline-block mx-1 px-1 py-1"
+      className="border-gray-600 border-[1px] border-solid cursor-pointer inline-block mx-1 px-1 py-1"
       onClick={() => handleSelectedClick(
         selectedIndex,
         selectedType,
