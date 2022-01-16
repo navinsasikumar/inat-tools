@@ -6,6 +6,7 @@ const SearchFilter = ({
   excludedTaxa,
   typedValue,
   handleInputChangeFns,
+  handleInputBlurFns,
   handleSelectFns,
   handleSelectedClick,
 }) => {
@@ -19,6 +20,7 @@ const SearchFilter = ({
             excludedTaxa={excludedTaxa}
             typedValue={typedValue.taxon}
             handleTaxaChange={handleInputChangeFns.taxa}
+            handleTaxaBlur={handleInputBlurFns.taxa}
             handleSelectFn={handleSelectFns.taxa}
             handleSelectedClick={handleSelectedClick}
           />

@@ -2,11 +2,12 @@ import AutoComplete from '../autocomplete';
 import SelectedFieldsDisplay from '../selected-fields-display';
 
 const TaxaFilter = ({
-  handleTaxaChange,
   taxaList,
   selectedTaxa,
   excludedTaxa,
   typedValue,
+  handleTaxaChange,
+  handleTaxaBlur,
   handleSelectFn,
   handleSelectedClick,
 }) => {
@@ -20,6 +21,7 @@ const TaxaFilter = ({
         placeholder="Taxa"
         className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-500 rounded py-2 px-2 mb-1 leading-tight focus:outline-none focus:bg-white"
         onChange={handleTaxaChange}
+        onBlur={handleTaxaBlur}
         value={typedValue}
       /> 
       {taxaList && taxaList.results && taxaList.results.length > 0 && 

@@ -28,7 +28,15 @@ const SearchResults = () => {
       setTypedValue({...typedValue, taxon: searchStr});
       if (searchStr.length > 2) {
         setTaxaMatch(searchStr);
+      } else {
+        setTaxaList([]);
       }
+    },
+  };
+
+  const handleInputBlurFns = {
+    taxa: () => {
+      setTimeout(() => setTaxaList([]), 500);
     },
   };
 
@@ -114,6 +122,7 @@ const SearchResults = () => {
           excludedTaxa={excludedTaxa}
           typedValue={typedValue}
           handleInputChangeFns={handleInputChangeFns}
+          handleInputBlurFns={handleInputBlurFns}
           handleSelectFns={handleSelectFns}
           handleSelectedClick={handleSelectedClick}
         />
