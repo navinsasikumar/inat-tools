@@ -20,12 +20,14 @@ const SearchResults = () => {
   const [selectedTaxa, setSelectedTaxa] = useState([]);
   const [typedValue, setTypedValue] = useState({ taxon: ''});
 
-  const handleTaxaChange = (event) => {
-    const searchStr = event.target.value;
-    setTypedValue({...typedValue, taxon: searchStr});
-    if (searchStr.length > 2) {
-      setTaxaMatch(searchStr);
-    }
+  const handleInputChangeFns = {
+    taxa: (event) => {
+      const searchStr = event.target.value;
+      setTypedValue({...typedValue, taxon: searchStr});
+      if (searchStr.length > 2) {
+        setTaxaMatch(searchStr);
+      }
+    },
   };
 
   const handleSelectFns = {
@@ -55,7 +57,6 @@ const SearchResults = () => {
   useEffect(() => {
     async function fetchAPI() {
       const res = await axios.get(`${INAT_API_URL}/taxa/autocomplete?q=${taxaMatch}`)
-      console.log(res.data);
       setTaxaList(res.data);
     }
 
@@ -98,10 +99,10 @@ const SearchResults = () => {
     <div>
       <section className="container mx-auto px-6 mb-10"> 
         <SearchFilters
-          handleTaxaChange={handleTaxaChange}
           taxaList={taxaList}
           selectedTaxa={selectedTaxa}
           typedValue={typedValue}
+          handleInputChangeFns={handleInputChangeFns}
           handleSelectFns={handleSelectFns}
           handleSelectedClick={handleSelectedClick}
         />

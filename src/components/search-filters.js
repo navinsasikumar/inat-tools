@@ -1,10 +1,10 @@
 import TaxaFilter from './filters/taxa';
 
 const SearchFilter = ({
-  handleTaxaChange,
   taxaList,
   selectedTaxa,
   typedValue,
+  handleInputChangeFns,
   handleSelectFns,
   handleSelectedClick,
 }) => {
@@ -13,10 +13,10 @@ const SearchFilter = ({
       <div className="flex flex-wrap -mx-3 mb-6">
         <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
           <TaxaFilter
-            handleTaxaChange={handleTaxaChange}
             taxaList={taxaList}
             selectedTaxa={selectedTaxa}
             typedValue={typedValue.taxon}
+            handleTaxaChange={handleInputChangeFns.taxa}
             handleSelectFn={handleSelectFns.taxa}
             handleSelectedClick={handleSelectedClick}
           />
