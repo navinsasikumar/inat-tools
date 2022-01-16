@@ -5,11 +5,13 @@ const TaxaFilter = ({
   handleTaxaChange,
   taxaList,
   selectedTaxa,
+  excludedTaxa,
   typedValue,
   handleSelectFn,
   handleSelectedClick,
 }) => {
   const selectedTaxaLabel = selectedTaxa.length > 0 ? 'Selected Taxa: ' : '';
+  const excludedTaxaLabel = excludedTaxa.length > 0 ? 'Excluded Taxa: ' : '';
 
   return (
     <div>
@@ -27,6 +29,12 @@ const TaxaFilter = ({
         selectedArray={selectedTaxa}
         selectedLabel={selectedTaxaLabel}
         selectedType="taxa"
+        handleSelectedClick={handleSelectedClick}
+      />
+      <SelectedFieldsDisplay
+        selectedArray={excludedTaxa}
+        selectedLabel={excludedTaxaLabel}
+        selectedType="taxaExclude"
         handleSelectedClick={handleSelectedClick}
       />
     </div>

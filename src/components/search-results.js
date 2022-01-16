@@ -18,6 +18,8 @@ const SearchResults = () => {
   const [taxaMatch, setTaxaMatch] = useState('');
   const [taxaList, setTaxaList] = useState([]);
   const [selectedTaxa, setSelectedTaxa] = useState([]);
+  const [excludedTaxa, setExcludedTaxa] = useState([]);
+  
   const [typedValue, setTypedValue] = useState({ taxon: ''});
 
   const handleInputChangeFns = {
@@ -37,7 +39,9 @@ const SearchResults = () => {
         setTaxaList([]);
         setTypedValue({...typedValue, taxon: ''});
       } else {
-        console.log(selectedTaxon);
+        setExcludedTaxa([...excludedTaxa, selectedTaxon]);
+        setTaxaList([]);
+        setTypedValue({...typedValue, taxon: ''});
       }
     },
   };
@@ -48,6 +52,12 @@ const SearchResults = () => {
         const localSelectedTaxa = [...selectedTaxa];
         localSelectedTaxa.splice(index, 1);
         setSelectedTaxa(localSelectedTaxa);
+        break;
+      }
+      case 'taxaExclude': {
+        const localExcludedTaxa = [...excludedTaxa];
+        localExcludedTaxa.splice(index, 1);
+        setExcludedTaxa(localExcludedTaxa);
         break;
       }
       default:
@@ -68,10 +78,10 @@ const SearchResults = () => {
     const makeTaxaQuery = () => {
       const queryObj = {};
       const currTaxonIds = selectedTaxa.map(taxon => taxon.id);
-      // const currExcludedTaxonIds = excludedTaxa.map(taxon => taxon.id);
+      const currExcludedTaxonIds = excludedTaxa.map(taxon => taxon.id);
 
       if (currTaxonIds.length > 0) queryObj.taxon_ids = currTaxonIds.join(',');
-      // if (currExcludedTaxonIds.length > 0) queryObj.without_taxon_id = currExcludedTaxonIds.join(',');
+      if (currExcludedTaxonIds.length > 0) queryObj.without_taxon_id = currExcludedTaxonIds.join(',');
 
       return queryObj;
     }
@@ -89,7 +99,7 @@ const SearchResults = () => {
     }
 
     fetchAPI();
-  }, [selectedTaxa]);
+  }, [selectedTaxa, excludedTaxa]);
 
   useEffect(() => {
     navigate(`/?${query}`); 
@@ -101,6 +111,7 @@ const SearchResults = () => {
         <SearchFilters
           taxaList={taxaList}
           selectedTaxa={selectedTaxa}
+          excludedTaxa={excludedTaxa}
           typedValue={typedValue}
           handleInputChangeFns={handleInputChangeFns}
           handleSelectFns={handleSelectFns}

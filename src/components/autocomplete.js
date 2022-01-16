@@ -46,7 +46,10 @@ const displayTaxa = (matches, handleSelectFn) => {
                 </div>
               </div>
             </div>
-            <div className="border-l-[1px] border-gray-300 border-solid text-center hover:text-gray-400">
+            <div 
+              className="border-l-[1px] border-gray-300 border-solid text-center hover:text-gray-400"
+              onClick={() => handleTaxonSelect(taxon, true, handleSelectFn)}
+            >
               <div className="align-middle inline-block leading-10">
                 Exclude
                </div>

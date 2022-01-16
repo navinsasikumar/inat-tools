@@ -3,6 +3,7 @@ import TaxaFilter from './filters/taxa';
 const SearchFilter = ({
   taxaList,
   selectedTaxa,
+  excludedTaxa,
   typedValue,
   handleInputChangeFns,
   handleSelectFns,
@@ -15,6 +16,7 @@ const SearchFilter = ({
           <TaxaFilter
             taxaList={taxaList}
             selectedTaxa={selectedTaxa}
+            excludedTaxa={excludedTaxa}
             typedValue={typedValue.taxon}
             handleTaxaChange={handleInputChangeFns.taxa}
             handleSelectFn={handleSelectFns.taxa}
