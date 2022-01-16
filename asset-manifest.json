@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/inat-tools/static/css/main.7551e88a.css",
-    "main.js": "/inat-tools/static/js/main.47795be1.js",
+    "main.css": "/inat-tools/static/css/main.35b87046.css",
+    "main.js": "/inat-tools/static/js/main.72f04f62.js",
     "static/js/787.38e3139c.chunk.js": "/inat-tools/static/js/787.38e3139c.chunk.js",
     "static/media/logo.svg": "/inat-tools/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/inat-tools/index.html",
-    "main.7551e88a.css.map": "/inat-tools/static/css/main.7551e88a.css.map",
-    "main.47795be1.js.map": "/inat-tools/static/js/main.47795be1.js.map",
+    "main.35b87046.css.map": "/inat-tools/static/css/main.35b87046.css.map",
+    "main.72f04f62.js.map": "/inat-tools/static/js/main.72f04f62.js.map",
     "787.38e3139c.chunk.js.map": "/inat-tools/static/js/787.38e3139c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.7551e88a.css",
-    "static/js/main.47795be1.js"
+    "static/css/main.35b87046.css",
+    "static/js/main.72f04f62.js"
   ]
 }
