@@ -1,18 +1,34 @@
 import AutoComplete from '../autocomplete';
+import SelectedFieldsDisplay from '../selected-fields-display';
 
 const TaxaFilter = ({
   handleTaxaChange,
-  taxaList
+  taxaList,
+  selectedTaxa,
+  typedValue,
+  handleSelectFn,
+  handleSelectedClick,
 }) => {
+  const selectedTaxaLabel = selectedTaxa.length > 0 ? 'Selected Taxa: ' : '';
+
   return (
     <div>
       <input
         type="text"
         placeholder="Taxa"
-        className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+        className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-500 rounded py-2 px-2 mb-1 leading-tight focus:outline-none focus:bg-white"
         onChange={handleTaxaChange}
+        value={typedValue}
       /> 
-      <AutoComplete type="taxa" matches={taxaList} />
+      {taxaList && taxaList.results && taxaList.results.length > 0 && 
+        <AutoComplete type="taxa" matches={taxaList} handleSelectFn={handleSelectFn}/> 
+      }
+      <SelectedFieldsDisplay
+        selectedArray={selectedTaxa}
+        selectedLabel={selectedTaxaLabel}
+        selectedType="taxa"
+        handleSelectedClick={handleSelectedClick}
+      />
     </div>
   );
 };
