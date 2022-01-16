@@ -13,21 +13,21 @@ const ObservationCaption = ({obs}) => {
   }
 
   return (
-    <div class="overflow-hidden p-2 text-ellipsis whitespace-nowrap">
+    <div className="overflow-hidden p-2 text-ellipsis whitespace-nowrap">
       { commonName && (
         <>
-          <div class="text-sm">
+          <div className="text-sm">
             {commonName}
           </div>
           {latinName && (
-            <div class="italic text-xs">
+            <div className="italic text-xs">
               ({latinName})
             </div>
           )}
         </>
       )}
       { !commonName && latinName && (
-        <div class="italic text-sm">
+        <div className="italic text-sm">
           {latinName}
         </div>
       )}

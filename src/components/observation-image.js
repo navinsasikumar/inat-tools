@@ -1,6 +1,6 @@
 const ImageSquare = ({children}) => {
   return (
-    <div class="leading-[12rem] h-48 w-48 text-center">
+    <div className="leading-[12rem] h-48 w-48 text-center">
       {children}
     </div>
   );
@@ -14,7 +14,7 @@ const ObservationImage = ({photos}) => {
   if (dispPhoto) {
     return (
       <ImageSquare>
-        <img src={dispPhoto} alt={attribution} class="h-48 w-48 object-cover overflow-hidden t" />
+        <img src={dispPhoto} alt={attribution} className="h-48 w-48 object-cover overflow-hidden t" />
       </ImageSquare>
     );
   } else {

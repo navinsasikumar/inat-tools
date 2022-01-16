@@ -3,7 +3,7 @@ import ObservationCaption from './observation-caption';
 
 const ObservationSquare = ({obs}) => {
   return (
-    <div class="bg-zinc-900 max-w-[12rem] text-white w-48">
+    <div className="bg-zinc-900 max-w-[12rem] text-white w-48">
       <a href={obs.uri} target="_blank" rel="noopener noreferrer">
         <ObservationImage photos={obs.photos} />
         <ObservationCaption obs={obs} />
