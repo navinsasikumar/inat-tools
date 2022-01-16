@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import queryString from 'query-string';
 import INatLinks from './inat-links';
 import ObservationSquare from './observation-square';
@@ -10,6 +11,9 @@ const INAT_API_URL = 'https://api.inaturalist.org/v1';
 
 const SearchResults = () => {
   const [data, setData] = useState([]);
+
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
   
   const [taxaMatch, setTaxaMatch] = useState('');
   const [taxaList, setTaxaList] = useState([]);
@@ -65,6 +69,7 @@ const SearchResults = () => {
       };
       const queryStr = queryString.stringify(queryObj);
       const urlPath = queryStr ? `/observations?${queryStr}` : '/observations';
+      setQuery(queryStr);
 
       const res = await axios.get(`${INAT_API_URL}${urlPath}`);
       setData(res.data);
@@ -72,6 +77,10 @@ const SearchResults = () => {
 
     fetchAPI();
   }, [selectedTaxa]);
+
+  useEffect(() => {
+    navigate(`/?${query}`); 
+  }, [query, navigate]);
 
   return (
     <div>
@@ -83,7 +92,7 @@ const SearchResults = () => {
           typedValue={typedValue}
           handleSelectFns={handleSelectFns}
         />
-        <INatLinks queryStr="" />
+        <INatLinks queryStr={query} />
         <div className="w-full lg:flex items-center">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 my-10 mb-2 flex-wrap">
             {
