@@ -20,7 +20,12 @@ const SearchResults = () => {
   const [selectedTaxa, setSelectedTaxa] = useState([]);
   const [excludedTaxa, setExcludedTaxa] = useState([]);
   
-  const [typedValue, setTypedValue] = useState({ taxon: ''});
+  const [placesMatch, setPlacesMatch] = useState('');
+  const [placesList, setPlacesList] = useState([]);
+  const [selectedPlaces, setSelectedPlaces] = useState([]);
+  const [excludedPlaces, setExcludedPlaces] = useState([]);
+  
+  const [typedValue, setTypedValue] = useState({ taxon: '', place: ''});
 
   const handleInputChangeFns = {
     taxa: (event) => {
@@ -32,11 +37,23 @@ const SearchResults = () => {
         setTaxaList([]);
       }
     },
+    places: (event) => {
+      const searchStr = event.target.value;
+      setTypedValue({...typedValue, place: searchStr});
+      if (searchStr.length > 2) {
+        setPlacesMatch(searchStr);
+      } else {
+        setPlacesList([]);
+      }
+    },
   };
 
   const handleInputBlurFns = {
     taxa: () => {
       setTimeout(() => setTaxaList([]), 500);
+    },
+    places: () => {
+      setTimeout(() => setPlacesList([]), 500);
     },
   };
 
@@ -50,6 +67,17 @@ const SearchResults = () => {
         setExcludedTaxa([...excludedTaxa, selectedTaxon]);
         setTaxaList([]);
         setTypedValue({...typedValue, taxon: ''});
+      }
+    },
+    places: (selectedPlace, exclude = false) => {
+      if (exclude === false) {
+        setSelectedPlaces([...selectedPlaces, selectedPlace]);
+        setPlacesList([]);
+        setTypedValue({...typedValue, place: ''});
+      } else {
+        setExcludedPlaces([...excludedPlaces, selectedPlace]);
+        setPlacesList([]);
+        setTypedValue({...typedValue, place: ''});
       }
     },
   };
@@ -68,6 +96,18 @@ const SearchResults = () => {
         setExcludedTaxa(localExcludedTaxa);
         break;
       }
+      case 'places': {
+        const localSelectedPlaces = [...selectedPlaces];
+        localSelectedPlaces.splice(index, 1);
+        setSelectedPlaces(localSelectedPlaces);
+        break;
+      }
+      case 'placesExclude': {
+        const localExcludedPlaces = [...excludedPlaces];
+        localExcludedPlaces.splice(index, 1);
+        setExcludedPlaces(localExcludedPlaces);
+        break;
+      }
       default:
     } 
   };
@@ -83,6 +123,16 @@ const SearchResults = () => {
   }, [taxaMatch]);
 
   useEffect(() => {
+    async function fetchAPI() {
+      const res = await axios.get(`${INAT_API_URL}/places/autocomplete?q=${placesMatch}`)
+      setPlacesList(res.data);
+    }
+
+    const timeOutId = setTimeout(() => fetchAPI(), 500);
+    return () => clearTimeout(timeOutId);
+  }, [placesMatch]);
+
+  useEffect(() => {
     const makeTaxaQuery = () => {
       const queryObj = {};
       const currTaxonIds = selectedTaxa.map(taxon => taxon.id);
@@ -93,10 +143,22 @@ const SearchResults = () => {
 
       return queryObj;
     }
+    
+    const makePlacesQuery = () => {
+      const queryObj = {};
+      const currPlaceIds = selectedPlaces.map(place => place.id);
+      const currExcludedPlaceIds = excludedPlaces.map(place => place.id);
+
+      if (currPlaceIds.length > 0) queryObj.place_id = currPlaceIds.join(',');
+      if (currExcludedPlaceIds.length > 0) queryObj.not_in_place = currExcludedPlaceIds.join(',');
+
+      return queryObj;
+    }
 
     async function fetchAPI() {
       const queryObj = {
         ...makeTaxaQuery(),
+        ...makePlacesQuery(),
       };
       const queryStr = queryString.stringify(queryObj);
       const urlPath = queryStr ? `/observations?${queryStr}` : '/observations';
@@ -107,7 +169,7 @@ const SearchResults = () => {
     }
 
     fetchAPI();
-  }, [selectedTaxa, excludedTaxa]);
+  }, [selectedTaxa, excludedTaxa, selectedPlaces, excludedPlaces]);
 
   useEffect(() => {
     navigate(`/?${query}`); 
@@ -120,6 +182,9 @@ const SearchResults = () => {
           taxaList={taxaList}
           selectedTaxa={selectedTaxa}
           excludedTaxa={excludedTaxa}
+          placesList={placesList}
+          selectedPlaces={selectedPlaces}
+          excludedPlaces={excludedPlaces}
           typedValue={typedValue}
           handleInputChangeFns={handleInputChangeFns}
           handleInputBlurFns={handleInputBlurFns}

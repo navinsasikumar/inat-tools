@@ -59,13 +59,55 @@ const displayTaxa = (matches, handleSelectFn) => {
       </li>
     );
   })
-}
+};
+
+const handlePlaceSelect = (place, exclude, handleSelectFn) => {
+  const selectedPlace = {
+    id: place.id,
+    name: place.name,
+    display: place.display_name,
+  };
+  console.log(selectedPlace);
+  handleSelectFn(selectedPlace, exclude);
+};
+
+const displayPlaces = (matches, handleSelectFn) => {
+  return matches && Array.isArray(matches.results) && matches.results.map(place => {
+    return (
+      <li key={place.id}>
+        <div className="border-[1px] border-gray-800 border-solid p-1">
+          <div className="grid grid-cols-4 p-0">
+            <div
+              className="col-span-3 hover:text-gray-400"
+              onClick={() => handlePlaceSelect(place, false, handleSelectFn)}
+            >
+              <div className="align-middle inline-block pl-2">
+                {place.display_name}
+              </div>
+            </div>
+            <div 
+              className="border-l-[1px] border-gray-300 border-solid text-center hover:text-gray-400"
+              onClick={() => handlePlaceSelect(place, true, handleSelectFn)}
+            >
+              <div className="align-middle inline-block leading-10">
+                Exclude
+               </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    );
+  })
+};
 
 const getMatchesList = (type, matches, handleSelectFn) => {
   let matchesList;
   switch(type) {
     case 'taxa':
       matchesList = displayTaxa(matches, handleSelectFn);
+      break;
+    case 'places':
+      matchesList = displayPlaces(matches, handleSelectFn);
       break;
     default:
       matchesList = '<li></li>';
