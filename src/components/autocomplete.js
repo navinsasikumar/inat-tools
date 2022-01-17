@@ -104,7 +104,6 @@ const handleObsUserSelect = (obsUser, exclude, handleSelectFn) => {
     name: obsUser.name,
     login: obsUser.login,
   };
-  console.log(selectedObsUser);
   handleSelectFn(selectedObsUser, exclude);
 };
 
@@ -158,6 +157,66 @@ const displayObsUsers = (matches, handleSelectFn) => {
   })
 };
 
+const handleIdentUserSelect = (identUser, exclude, handleSelectFn) => {
+  const selectedIdentUser = {
+    id: identUser.id,
+    name: identUser.name,
+    login: identUser.login,
+  };
+  console.log(selectedIdentUser);
+  handleSelectFn(selectedIdentUser, exclude);
+};
+
+const displayIdentUsers = (matches, handleSelectFn) => {
+  return matches && Array.isArray(matches.results) && matches.results.map(identUser => {
+    let photoElem;
+    if (identUser.icon) {
+      photoElem = <img
+        className="h-10 w-10"
+        src={identUser.icon}
+        alt={identUser.login}
+      />;
+    } else {
+      photoElem = '';
+    }
+
+    return (
+      <li key={identUser.id}>
+        <div className="border-[1px] border-gray-800 border-solid p-1">
+          <div className="grid grid-cols-4 p-0">
+            <div
+              className="col-span-3 hover:text-gray-400"
+              onClick={() => handleIdentUserSelect(identUser, false, handleSelectFn)}
+            >
+              <div className="align-middle inline-block w-10">
+                {photoElem}
+              </div>
+              <div className="align-middle inline-block pl-2">
+                <div className="">
+                  {identUser.name}
+                </div>
+                <div className="">
+                  <div className="inline-block">
+                    {identUser.login}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div 
+              className="border-l-[1px] border-gray-300 border-solid text-center hover:text-gray-400"
+              onClick={() => handleIdentUserSelect(identUser, true, handleSelectFn)}
+            >
+              <div className="align-middle inline-block leading-10">
+                Exclude
+               </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    );
+  })
+};
+
 const getMatchesList = (type, matches, handleSelectFn) => {
   let matchesList;
   switch(type) {
@@ -169,6 +228,9 @@ const getMatchesList = (type, matches, handleSelectFn) => {
       break;
     case 'obsUsers':
       matchesList = displayObsUsers(matches, handleSelectFn);
+      break;
+    case 'identUsers':
+      matchesList = displayIdentUsers(matches, handleSelectFn);
       break;
     default:
       matchesList = '<li></li>';

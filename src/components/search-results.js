@@ -29,8 +29,18 @@ const SearchResults = () => {
   const [obsUsersList, setObsUsersList] = useState([]);
   const [selectedObsUsers, setSelectedObsUsers] = useState([]);
   const [excludedObsUsers, setExcludedObsUsers] = useState([]);
+
+  const [identUsersMatch, setIdentUsersMatch] = useState('');
+  const [identUsersList, setIdentUsersList] = useState([]);
+  const [selectedIdentUsers, setSelectedIdentUsers] = useState([]);
+  const [excludedIdentUsers, setExcludedIdentUsers] = useState([]);
   
-  const [typedValue, setTypedValue] = useState({ taxon: '', place: '', obsUser: '' });
+  const [typedValue, setTypedValue] = useState({
+    taxon: '',
+    place: '',
+    obsUser: '',
+    identUser: '',
+  });
 
   const handleInputChangeFns = {
     taxa: (event) => {
@@ -60,6 +70,15 @@ const SearchResults = () => {
         setObsUsersList([]);
       }
     },
+    identUsers: (event) => {
+      const searchStr = event.target.value;
+      setTypedValue({...typedValue, identUser: searchStr});
+      if (searchStr.length > 2) {
+        setIdentUsersMatch(searchStr);
+      } else {
+        setIdentUsersList([]);
+      }
+    },
   };
 
   const handleInputBlurFns = {
@@ -71,6 +90,9 @@ const SearchResults = () => {
     },
     obsUsers: () => {
       setTimeout(() => setObsUsersList([]), 500);
+    },
+    identUsers: () => {
+      setTimeout(() => setIdentUsersList([]), 500);
     },
   };
 
@@ -106,6 +128,17 @@ const SearchResults = () => {
         setExcludedObsUsers([...excludedObsUsers, selectedObsUser]);
         setObsUsersList([]);
         setTypedValue({...typedValue, obsUser: ''});
+      }
+    },
+    identUsers: (selectedIdentUser, exclude = false) => {
+      if (exclude === false) {
+        setSelectedIdentUsers([...selectedIdentUsers, selectedIdentUser]);
+        setIdentUsersList([]);
+        setTypedValue({...typedValue, identUser: ''});
+      } else {
+        setExcludedIdentUsers([...excludedIdentUsers, selectedIdentUser]);
+        setIdentUsersList([]);
+        setTypedValue({...typedValue, identUser: ''});
       }
     },
   };
@@ -148,6 +181,18 @@ const SearchResults = () => {
         setExcludedObsUsers(localExcludedObsUsers);
         break;
       }
+      case 'identUsers': {
+        const localSelectedIdentUsers = [...selectedIdentUsers];
+        localSelectedIdentUsers.splice(index, 1);
+        setSelectedIdentUsers(localSelectedIdentUsers);
+        break;
+      }
+      case 'identUsersExclude': {
+        const localExcludedIdentUsers = [...excludedIdentUsers];
+        localExcludedIdentUsers.splice(index, 1);
+        setExcludedIdentUsers(localExcludedIdentUsers);
+        break;
+      }
       default:
     } 
   };
@@ -183,6 +228,16 @@ const SearchResults = () => {
   }, [obsUsersMatch]);
 
   useEffect(() => {
+    async function fetchAPI() {
+      const res = await axios.get(`${INAT_API_URL}/users/autocomplete?q=${identUsersMatch}`)
+      setIdentUsersList(res.data);
+    }
+
+    const timeOutId = setTimeout(() => fetchAPI(), 500);
+    return () => clearTimeout(timeOutId);
+  }, [identUsersMatch]);
+
+  useEffect(() => {
     const makeTaxaQuery = () => {
       const queryObj = {};
       const currTaxonIds = selectedTaxa.map(taxon => taxon.id);
@@ -215,12 +270,24 @@ const SearchResults = () => {
 
       return queryObj;
     }
+    
+    const makeIdentUsersQuery = () => {
+      const queryObj = {};
+      const currIdentUserIds = selectedIdentUsers.map(identUser => identUser.id);
+      const currExcludedIdentUserIds = excludedIdentUsers.map(identUser => identUser.id);
+
+      if (currIdentUserIds.length > 0) queryObj.ident_user_id = currIdentUserIds.join(',');
+      if (currExcludedIdentUserIds.length > 0) queryObj.without_ident_user_id = currExcludedIdentUserIds.join(',');
+
+      return queryObj;
+    }
 
     async function fetchAPI() {
       const queryObj = {
         ...makeTaxaQuery(),
         ...makePlacesQuery(),
         ...makeObsUsersQuery(),
+        ...makeIdentUsersQuery(),
       };
       const queryStr = queryString.stringify(queryObj);
       const urlPath = queryStr ? `/observations?${queryStr}` : '/observations';
@@ -235,6 +302,7 @@ const SearchResults = () => {
     selectedTaxa, excludedTaxa,
     selectedPlaces, excludedPlaces,
     selectedObsUsers, excludedObsUsers,
+    selectedIdentUsers, excludedIdentUsers,
   ]);
 
   useEffect(() => {
@@ -254,6 +322,9 @@ const SearchResults = () => {
           obsUsersList={obsUsersList}
           selectedObsUsers={selectedObsUsers}
           excludedObsUsers={excludedObsUsers}
+          identUsersList={identUsersList}
+          selectedIdentUsers={selectedIdentUsers}
+          excludedIdentUsers={excludedIdentUsers}
           typedValue={typedValue}
           handleInputChangeFns={handleInputChangeFns}
           handleInputBlurFns={handleInputBlurFns}

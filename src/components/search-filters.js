@@ -1,6 +1,7 @@
 import TaxaFilter from './filters/taxa';
 import PlacesFilter from './filters/places';
 import ObsUsersFilter from './filters/obs-users';
+import IdentUsersFilter from './filters/ident-users';
 
 const SearchFilter = ({
   taxaList,
@@ -12,6 +13,9 @@ const SearchFilter = ({
   obsUsersList,
   selectedObsUsers,
   excludedObsUsers,
+  identUsersList,
+  selectedIdentUsers,
+  excludedIdentUsers,
   typedValue,
   handleInputChangeFns,
   handleInputBlurFns,
@@ -60,7 +64,21 @@ const SearchFilter = ({
             handleSelectedClick={handleSelectedClick}
           />
         </div> 
+        
+        <div className="w-full md:w-1/2 px-3 mb-2 md:mb-0">
+          <IdentUsersFilter
+            identUsersList={identUsersList}
+            selectedIdentUsers={selectedIdentUsers}
+            excludedIdentUsers={excludedIdentUsers}
+            typedValue={typedValue.identUser}
+            handleIdentUsersChange={handleInputChangeFns.identUsers}
+            handleIdentUsersBlur={handleInputBlurFns.identUsers}
+            handleSelectFn={handleSelectFns.identUsers}
+            handleSelectedClick={handleSelectedClick}
+          />
+        </div> 
       </div>
+
     </form>
   );
 };
