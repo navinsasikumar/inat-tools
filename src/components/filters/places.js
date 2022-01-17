@@ -27,18 +27,22 @@ const PlacesFilter = ({
       {placesList && placesList.results && placesList.results.length > 0 && 
         <AutoComplete type="places" matches={placesList} handleSelectFn={handleSelectFn}/> 
       }
-      <SelectedFieldsDisplay
-        selectedArray={selectedPlaces}
-        selectedLabel={selectedPlacesLabel}
-        selectedType="places"
-        handleSelectedClick={handleSelectedClick}
-      />
-      <SelectedFieldsDisplay
-        selectedArray={excludedPlaces}
-        selectedLabel={excludedPlacesLabel}
-        selectedType="placesExclude"
-        handleSelectedClick={handleSelectedClick}
-      />
+      {selectedPlaces.length > 0 &&
+        <SelectedFieldsDisplay
+          selectedArray={selectedPlaces}
+          selectedLabel={selectedPlacesLabel}
+          selectedType="places"
+          handleSelectedClick={handleSelectedClick}
+        />
+      }
+      {excludedPlaces.length > 0 &&
+        <SelectedFieldsDisplay
+          selectedArray={excludedPlaces}
+          selectedLabel={excludedPlacesLabel}
+          selectedType="placesExclude"
+          handleSelectedClick={handleSelectedClick}
+        />
+      }
     </div>
   );
 };

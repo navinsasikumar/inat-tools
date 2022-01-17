@@ -27,18 +27,22 @@ const TaxaFilter = ({
       {taxaList && taxaList.results && taxaList.results.length > 0 && 
         <AutoComplete type="taxa" matches={taxaList} handleSelectFn={handleSelectFn}/> 
       }
-      <SelectedFieldsDisplay
-        selectedArray={selectedTaxa}
-        selectedLabel={selectedTaxaLabel}
-        selectedType="taxa"
-        handleSelectedClick={handleSelectedClick}
-      />
-      <SelectedFieldsDisplay
-        selectedArray={excludedTaxa}
-        selectedLabel={excludedTaxaLabel}
-        selectedType="taxaExclude"
-        handleSelectedClick={handleSelectedClick}
-      />
+      {selectedTaxa.length > 0 &&
+        <SelectedFieldsDisplay
+          selectedArray={selectedTaxa}
+          selectedLabel={selectedTaxaLabel}
+          selectedType="taxa"
+          handleSelectedClick={handleSelectedClick}
+        />
+      }
+      {excludedTaxa.length > 0 &&
+        <SelectedFieldsDisplay
+          selectedArray={excludedTaxa}
+          selectedLabel={excludedTaxaLabel}
+          selectedType="taxaExclude"
+          handleSelectedClick={handleSelectedClick}
+        />
+      }
     </div>
   );
 };

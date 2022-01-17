@@ -11,8 +11,8 @@ const ObsUsersFilter = ({
   handleSelectFn,
   handleSelectedClick,
 }) => {
-  const selectedObsUsersLabel = selectedObsUsers.length > 0 ? 'Selected ObsUsers: ' : '';
-  const excludedObsUsersLabel = excludedObsUsers.length > 0 ? 'Excluded ObsUsers: ' : '';
+  const selectedObsUsersLabel = selectedObsUsers.length > 0 ? 'Selected Users: ' : '';
+  const excludedObsUsersLabel = excludedObsUsers.length > 0 ? 'Excluded Users: ' : '';
 
   return (
     <div className="h-min max-h-min">
@@ -27,18 +27,22 @@ const ObsUsersFilter = ({
       {obsUsersList && obsUsersList.results && obsUsersList.results.length > 0 && 
         <AutoComplete type="obsUsers" matches={obsUsersList} handleSelectFn={handleSelectFn}/> 
       }
-      <SelectedFieldsDisplay
-        selectedArray={selectedObsUsers}
-        selectedLabel={selectedObsUsersLabel}
-        selectedType="obsUsers"
-        handleSelectedClick={handleSelectedClick}
-      />
-      <SelectedFieldsDisplay
-        selectedArray={excludedObsUsers}
-        selectedLabel={excludedObsUsersLabel}
-        selectedType="obsUsersExclude"
-        handleSelectedClick={handleSelectedClick}
-      />
+      {selectedObsUsers.length > 0 && 
+        <SelectedFieldsDisplay
+          selectedArray={selectedObsUsers}
+          selectedLabel={selectedObsUsersLabel}
+          selectedType="obsUsers"
+          handleSelectedClick={handleSelectedClick}
+        />
+      }
+      {excludedObsUsers.length > 0 && 
+        <SelectedFieldsDisplay
+          selectedArray={excludedObsUsers}
+          selectedLabel={excludedObsUsersLabel}
+          selectedType="obsUsersExclude"
+          handleSelectedClick={handleSelectedClick}
+        />
+      }
     </div>
   );
 };
