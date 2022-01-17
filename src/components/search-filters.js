@@ -2,6 +2,7 @@ import TaxaFilter from './filters/taxa';
 import PlacesFilter from './filters/places';
 import ObsUsersFilter from './filters/obs-users';
 import IdentUsersFilter from './filters/ident-users';
+import AnnotationsFilter from './filters/annotations';
 
 const SearchFilter = ({
   taxaList,
@@ -16,6 +17,13 @@ const SearchFilter = ({
   identUsersList,
   selectedIdentUsers,
   excludedIdentUsers,
+  annotationTermsList,
+  selectedAnnotationTerms,
+  excludedAnnotationTerms,
+  annotationValuesList,
+  selectedAnnotationValues,
+  excludedAnnotationValues,
+  annotationValuesOnFocus,
   typedValue,
   handleInputChangeFns,
   handleInputBlurFns,
@@ -79,6 +87,29 @@ const SearchFilter = ({
         </div> 
       </div>
 
+      <div className="flex flex-wrap -mx-3 mb-1">
+        <div className="w-full md:w-1/2 px-3 mb-2 md:mb-0">
+          <AnnotationsFilter
+            annotationTermsList={annotationTermsList}
+            selectedAnnotationTerms={selectedAnnotationTerms}
+            excludedAnnotationTerms={excludedAnnotationTerms}
+            typedValue={typedValue.annotationTerm}
+            handleAnnotationTermsChange={handleInputChangeFns.annotationTerms}
+            handleAnnotationTermsBlur={handleInputBlurFns.annotationTerms}
+            handleTermSelectFn={handleSelectFns.annotationTerms}
+            handleSelectedClick={handleSelectedClick}
+            annotationValuesList={annotationValuesList}
+            selectedAnnotationValues={selectedAnnotationValues}
+            excludedAnnotationValues={excludedAnnotationValues}
+            annotationValuesOnFocus={annotationValuesOnFocus}
+            handleAnnotationValuesChange={handleInputChangeFns.annotationValues}
+            handleAnnotationValuesBlur={handleInputBlurFns.annotationValues}
+            handleValuesSelectFn={handleSelectFns.annotationValues}
+          />
+        </div> 
+      
+      </div>
+        
     </form>
   );
 };

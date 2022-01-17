@@ -34,12 +34,24 @@ const SearchResults = () => {
   const [identUsersList, setIdentUsersList] = useState([]);
   const [selectedIdentUsers, setSelectedIdentUsers] = useState([]);
   const [excludedIdentUsers, setExcludedIdentUsers] = useState([]);
+
+  const [annotationTermsMatch, setAnnotationTermsMatch] = useState('');
+  const [annotationTermsList, setAnnotationTermsList] = useState([]);
+  const [selectedAnnotationTerms, setSelectedAnnotationTerms] = useState([]);
+  const [excludedAnnotationTerms, setExcludedAnnotationTerms] = useState([]);
+
+  const [annotationValuesList, setAnnotationValuesList] = useState([]);
+  const [selectedAnnotationValues, setSelectedAnnotationValues] = useState([]);
+  const [excludedAnnotationValues, setExcludedAnnotationValues] = useState([]);
+  const [annotationValuesOnFocus, setAnnotationValuesOnFocus] = useState(false);
   
   const [typedValue, setTypedValue] = useState({
     taxon: '',
     place: '',
     obsUser: '',
     identUser: '',
+    annotationTerm: '',
+    annotationValue: '',
   });
 
   const handleInputChangeFns = {
@@ -79,6 +91,16 @@ const SearchResults = () => {
         setIdentUsersList([]);
       }
     },
+    annotationTerms: (event) => {
+      if (event) {
+        setAnnotationTermsMatch('search');
+      }
+    },
+    annotationValues: (event) => {
+      if (event) {
+        setAnnotationValuesOnFocus(true);
+      }
+    },
   };
 
   const handleInputBlurFns = {
@@ -93,6 +115,13 @@ const SearchResults = () => {
     },
     identUsers: () => {
       setTimeout(() => setIdentUsersList([]), 500);
+    },
+    annotationTerms: () => {
+      setTimeout(() => setAnnotationTermsList([]), 500);
+      setAnnotationTermsMatch('');
+    },
+    annotationValues: () => {
+      setTimeout(() => setAnnotationValuesOnFocus(false), 500);
     },
   };
 
@@ -139,6 +168,39 @@ const SearchResults = () => {
         setExcludedIdentUsers([...excludedIdentUsers, selectedIdentUser]);
         setIdentUsersList([]);
         setTypedValue({...typedValue, identUser: ''});
+      }
+    },
+    annotationTerms: (selectedAnnotationTerm, exclude = false) => {
+      if (exclude === false) {
+        if (!selectedAnnotationTerms.some(e => e.id === selectedAnnotationTerm.id)) {
+          setSelectedAnnotationTerms([...selectedAnnotationTerms, selectedAnnotationTerm]);
+        }
+        setAnnotationTermsList([]);
+        setTypedValue({...typedValue, annotationTerm: ''});
+        const annotationValues = JSON.parse(JSON.stringify(selectedAnnotationTerm.values));
+        annotationValues.forEach((value) => {
+          const annotationVal = value;
+          annotationVal.termId = selectedAnnotationTerm.id;
+          annotationVal.termLabel = selectedAnnotationTerm.label;
+        });
+        setAnnotationValuesList(annotationValues);
+      } else {
+        if (!excludedAnnotationTerms.some(e => e.id === selectedAnnotationTerm.id)) {
+          setExcludedAnnotationTerms([...excludedAnnotationTerms, selectedAnnotationTerm]);
+        }
+        setAnnotationTermsList([]);
+        setTypedValue({...typedValue, annotationTerm: ''});
+      }
+    },
+    annotationValues: (selectedAnnotationValue, exclude = false) => {
+      if (exclude === false) {
+        setSelectedAnnotationValues([...selectedAnnotationValues, selectedAnnotationValue]);
+        setAnnotationValuesList([]);
+        setTypedValue({...typedValue, annotationValue: ''});
+      } else {
+        setExcludedAnnotationValues([...excludedAnnotationValues, selectedAnnotationValue]);
+        setAnnotationValuesList([]);
+        setTypedValue({...typedValue, annotationValue: ''});
       }
     },
   };
@@ -193,6 +255,72 @@ const SearchResults = () => {
         setExcludedIdentUsers(localExcludedIdentUsers);
         break;
       }
+      case 'annotationTerms': {
+        const localSelectedAnnotationTerms = [...selectedAnnotationTerms];
+        localSelectedAnnotationTerms.splice(index, 1);
+        setSelectedAnnotationTerms(localSelectedAnnotationTerms);
+        break;
+      }
+      case 'annotationTermsExclude': {
+        const localExcludedAnnotationTerms = [...excludedAnnotationTerms];
+        localExcludedAnnotationTerms.splice(index, 1);
+        setExcludedAnnotationTerms(localExcludedAnnotationTerms);
+        break;
+      }
+      case 'annotationValues': {
+        if (value.termId) {
+          // This is a value - remove value and check if any other values with that termId exists
+          // If none, remove the term as well
+          const localSelectedAnnotationValues = [...selectedAnnotationValues];
+          const localSelectedAnnotationTerms = [...selectedAnnotationTerms];
+
+          localSelectedAnnotationValues.splice(index, 1);
+
+          const matchedTerms = localSelectedAnnotationValues
+            .findIndex(elem => elem.termId === value.termId) >= 0;
+
+          if (!matchedTerms) {
+            const matchedIndex = localSelectedAnnotationTerms.findIndex(elem => elem.id === value.termId);
+            localSelectedAnnotationTerms.splice(matchedIndex, 1);
+          }
+          setSelectedAnnotationValues(localSelectedAnnotationValues);
+          setSelectedAnnotationTerms(localSelectedAnnotationTerms);
+        } else {
+          // This is a term -  remove the term
+          const localSelectedAnnotationTerms = [...selectedAnnotationTerms];
+          const matchedIndex = localSelectedAnnotationTerms.findIndex(elem => elem.id === value.id);
+          localSelectedAnnotationTerms.splice(matchedIndex, 1);
+          setSelectedAnnotationTerms(localSelectedAnnotationTerms);
+        }
+        break;
+      }
+      case 'annotationValuesExclude': {
+        if (value.termId) {
+          // This is a value - remove value and check if any other values with that termId exists
+          // If none, remove the term as well
+          const localExcludedAnnotationValues = [...excludedAnnotationValues];
+          const localExcludedAnnotationTerms = [...excludedAnnotationTerms];
+
+          localExcludedAnnotationValues.splice(index, 1);
+
+          const matchedTerms = localExcludedAnnotationValues
+            .findIndex(elem => elem.termId === value.termId) >= 0;
+
+          if (!matchedTerms) {
+            const matchedIndex = localExcludedAnnotationTerms.findIndex(elem => elem.id === value.termId);
+            localExcludedAnnotationTerms.splice(matchedIndex, 1);
+          }
+          setExcludedAnnotationValues(localExcludedAnnotationValues);
+          setExcludedAnnotationTerms(localExcludedAnnotationTerms);
+        } else {
+          // This is a term -  remove the term
+          const localExcludedAnnotationTerms = [...excludedAnnotationTerms];
+          const matchedIndex = localExcludedAnnotationTerms.findIndex(elem => elem.id === value.id);
+          localExcludedAnnotationTerms.splice(matchedIndex, 1);
+          setExcludedAnnotationTerms(localExcludedAnnotationTerms);
+        }
+        break;
+      }
       default:
     } 
   };
@@ -236,6 +364,17 @@ const SearchResults = () => {
     const timeOutId = setTimeout(() => fetchAPI(), 500);
     return () => clearTimeout(timeOutId);
   }, [identUsersMatch]);
+
+  useEffect(() => {
+    async function fetchAPI() {
+      const res = await axios.get(`${INAT_API_URL}/controlled_terms`)
+      setAnnotationTermsList(res.data);
+    }
+
+    if (annotationTermsMatch === 'search') {
+      fetchAPI();
+    }
+  }, [annotationTermsMatch]);
 
   useEffect(() => {
     const makeTaxaQuery = () => {
@@ -282,12 +421,36 @@ const SearchResults = () => {
       return queryObj;
     }
 
+    const makeAnnotationTermsQuery = () => {
+      const queryObj = {};
+      const currAnnotationTermIds = selectedAnnotationTerms.map(annotationTerm => annotationTerm.id);
+      const currExcludedAnnotationTermIds = excludedAnnotationTerms.map(annotationTerm => annotationTerm.id);
+
+      if (currAnnotationTermIds.length > 0) queryObj.term_id = currAnnotationTermIds.join(',');
+      if (currExcludedAnnotationTermIds.length > 0) queryObj.wthout_term_id = currExcludedAnnotationTermIds.join(',');
+
+      return queryObj;
+    }
+
+    const makeAnnotationValuesQuery = () => {
+      const queryObj = {};
+      const currAnnotationValueIds = selectedAnnotationValues.map(annotationValue => annotationValue.id);
+      const currExcludedAnnotationValueIds = excludedAnnotationValues.map(annotationValue => annotationValue.id);
+
+      if (currAnnotationValueIds.length > 0) queryObj.term_value_id = currAnnotationValueIds.join(',');
+      if (currExcludedAnnotationValueIds.length > 0) queryObj.without_term_value_id = currExcludedAnnotationValueIds.join(',');
+
+      return queryObj;
+    }
+
     async function fetchAPI() {
       const queryObj = {
         ...makeTaxaQuery(),
         ...makePlacesQuery(),
         ...makeObsUsersQuery(),
         ...makeIdentUsersQuery(),
+        ...makeAnnotationTermsQuery(),
+        ...makeAnnotationValuesQuery(),
       };
       const queryStr = queryString.stringify(queryObj);
       const urlPath = queryStr ? `/observations?${queryStr}` : '/observations';
@@ -303,6 +466,8 @@ const SearchResults = () => {
     selectedPlaces, excludedPlaces,
     selectedObsUsers, excludedObsUsers,
     selectedIdentUsers, excludedIdentUsers,
+    selectedAnnotationTerms, excludedAnnotationTerms,
+    selectedAnnotationValues, excludedAnnotationValues,
   ]);
 
   useEffect(() => {
@@ -325,6 +490,13 @@ const SearchResults = () => {
           identUsersList={identUsersList}
           selectedIdentUsers={selectedIdentUsers}
           excludedIdentUsers={excludedIdentUsers}
+          annotationTermsList={annotationTermsList}
+          selectedAnnotationTerms={selectedAnnotationTerms}
+          excludedAnnotationTerms={excludedAnnotationTerms}
+          annotationValuesList={annotationValuesList}
+          selectedAnnotationValues={selectedAnnotationValues}
+          excludedAnnotationValues={excludedAnnotationValues}
+          annotationValuesOnFocus={annotationValuesOnFocus}
           typedValue={typedValue}
           handleInputChangeFns={handleInputChangeFns}
           handleInputBlurFns={handleInputBlurFns}

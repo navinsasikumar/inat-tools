@@ -163,7 +163,6 @@ const handleIdentUserSelect = (identUser, exclude, handleSelectFn) => {
     name: identUser.name,
     login: identUser.login,
   };
-  console.log(selectedIdentUser);
   handleSelectFn(selectedIdentUser, exclude);
 };
 
@@ -217,6 +216,72 @@ const displayIdentUsers = (matches, handleSelectFn) => {
   })
 };
 
+const handleAnnotationTermSelect = (annotationTerm, exclude, handleSelectFn) => {
+  handleSelectFn(annotationTerm, exclude);
+};
+
+const displayAnnotationTerms = (matches, handleSelectFn) => {
+  return matches && Array.isArray(matches.results) && matches.results.map(annotationTerm => {
+    return (
+      <li key={annotationTerm.id}>
+        <div className="border-[1px] border-gray-800 border-solid p-1">
+          <div className="grid grid-cols-4 p-0">
+            <div
+              className="col-span-3 hover:text-gray-400"
+              onClick={() => handleAnnotationTermSelect(annotationTerm, false, handleSelectFn)}
+            >
+              <div className="align-middle inline-block pl-2">
+                {annotationTerm.label}
+              </div>
+            </div>
+            <div 
+              className="border-l-[1px] border-gray-300 border-solid text-center hover:text-gray-400"
+              onClick={() => handleAnnotationTermSelect(annotationTerm, true, handleSelectFn)}
+            >
+              <div className="align-middle inline-block leading-10">
+                Exclude
+               </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    );
+  })
+};
+
+const handleAnnotationValueSelect = (annotationValue, exclude, handleSelectFn) => {
+  handleSelectFn(annotationValue, exclude);
+};
+
+const displayAnnotationValues = (matches, handleSelectFn) => {
+  return matches && Array.isArray(matches) && matches.map(annotationValue => {
+    return (
+      <li key={annotationValue.id}>
+        <div className="border-[1px] border-gray-800 border-solid p-1">
+          <div className="grid grid-cols-4 p-0">
+            <div
+              className="col-span-3 hover:text-gray-400"
+              onClick={() => handleAnnotationValueSelect(annotationValue, false, handleSelectFn)}
+            >
+              <div className="align-middle inline-block pl-2">
+                {annotationValue.label}
+              </div>
+            </div>
+            <div 
+              className="border-l-[1px] border-gray-300 border-solid text-center hover:text-gray-400"
+              onClick={() => handleAnnotationValueSelect(annotationValue, true, handleSelectFn)}
+            >
+              <div className="align-middle inline-block leading-10">
+                Exclude
+               </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    );
+  })
+};
+
 const getMatchesList = (type, matches, handleSelectFn) => {
   let matchesList;
   switch(type) {
@@ -232,6 +297,12 @@ const getMatchesList = (type, matches, handleSelectFn) => {
     case 'identUsers':
       matchesList = displayIdentUsers(matches, handleSelectFn);
       break;
+    case 'annotationTerms':
+      matchesList = displayAnnotationTerms(matches, handleSelectFn);
+      break;
+    case 'annotationValues':
+      matchesList = displayAnnotationValues(matches, handleSelectFn);
+      break;
     default:
       matchesList = '<li></li>';
   }
@@ -246,7 +317,7 @@ const AutoComplete = ({
   const matchesList = getMatchesList(type, matches, handleSelectFn);
   return (
     <div className="relative">
-      <ul className="absolute bg-slate-900 cursor-pointer pt-1 text-xs text-white -top-2 w-96 z-50">
+      <ul className="absolute bg-slate-900 cursor-pointer pt-1 text-xs text-white -top-2 w-fit max-w-7xl min-w-[100%] z-50">
         {matchesList}
       </ul>
     </div>
