@@ -15,7 +15,7 @@ const PlacesFilter = ({
   const excludedPlacesLabel = excludedPlaces.length > 0 ? 'Excluded Places: ' : '';
 
   return (
-    <div>
+    <div className="h-min max-h-min">
       <input
         type="text"
         placeholder="Places"

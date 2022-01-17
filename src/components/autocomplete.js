@@ -4,7 +4,6 @@ const handleTaxonSelect = (taxon, exclude, handleSelectFn) => {
     name: taxon.name,
     common: taxon.preferred_common_name,
   };
-  console.log(selectedTaxon);
   handleSelectFn(selectedTaxon, exclude);
 };
 
@@ -67,7 +66,6 @@ const handlePlaceSelect = (place, exclude, handleSelectFn) => {
     name: place.name,
     display: place.display_name,
   };
-  console.log(selectedPlace);
   handleSelectFn(selectedPlace, exclude);
 };
 
@@ -100,6 +98,66 @@ const displayPlaces = (matches, handleSelectFn) => {
   })
 };
 
+const handleObsUserSelect = (obsUser, exclude, handleSelectFn) => {
+  const selectedObsUser = {
+    id: obsUser.id,
+    name: obsUser.name,
+    login: obsUser.login,
+  };
+  console.log(selectedObsUser);
+  handleSelectFn(selectedObsUser, exclude);
+};
+
+const displayObsUsers = (matches, handleSelectFn) => {
+  return matches && Array.isArray(matches.results) && matches.results.map(obsUser => {
+    let photoElem;
+    if (obsUser.icon) {
+      photoElem = <img
+        className="h-10 w-10"
+        src={obsUser.icon}
+        alt={obsUser.login}
+      />;
+    } else {
+      photoElem = '';
+    }
+
+    return (
+      <li key={obsUser.id}>
+        <div className="border-[1px] border-gray-800 border-solid p-1">
+          <div className="grid grid-cols-4 p-0">
+            <div
+              className="col-span-3 hover:text-gray-400"
+              onClick={() => handleObsUserSelect(obsUser, false, handleSelectFn)}
+            >
+              <div className="align-middle inline-block w-10">
+                {photoElem}
+              </div>
+              <div className="align-middle inline-block pl-2">
+                <div className="">
+                  {obsUser.name}
+                </div>
+                <div className="">
+                  <div className="inline-block">
+                    {obsUser.login}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div 
+              className="border-l-[1px] border-gray-300 border-solid text-center hover:text-gray-400"
+              onClick={() => handleObsUserSelect(obsUser, true, handleSelectFn)}
+            >
+              <div className="align-middle inline-block leading-10">
+                Exclude
+               </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    );
+  })
+};
+
 const getMatchesList = (type, matches, handleSelectFn) => {
   let matchesList;
   switch(type) {
@@ -108,6 +166,9 @@ const getMatchesList = (type, matches, handleSelectFn) => {
       break;
     case 'places':
       matchesList = displayPlaces(matches, handleSelectFn);
+      break;
+    case 'obsUsers':
+      matchesList = displayObsUsers(matches, handleSelectFn);
       break;
     default:
       matchesList = '<li></li>';

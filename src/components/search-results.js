@@ -25,7 +25,12 @@ const SearchResults = () => {
   const [selectedPlaces, setSelectedPlaces] = useState([]);
   const [excludedPlaces, setExcludedPlaces] = useState([]);
   
-  const [typedValue, setTypedValue] = useState({ taxon: '', place: ''});
+  const [obsUsersMatch, setObsUsersMatch] = useState('');
+  const [obsUsersList, setObsUsersList] = useState([]);
+  const [selectedObsUsers, setSelectedObsUsers] = useState([]);
+  const [excludedObsUsers, setExcludedObsUsers] = useState([]);
+  
+  const [typedValue, setTypedValue] = useState({ taxon: '', place: '', obsUser: '' });
 
   const handleInputChangeFns = {
     taxa: (event) => {
@@ -46,6 +51,15 @@ const SearchResults = () => {
         setPlacesList([]);
       }
     },
+    obsUsers: (event) => {
+      const searchStr = event.target.value;
+      setTypedValue({...typedValue, obsUser: searchStr});
+      if (searchStr.length > 2) {
+        setObsUsersMatch(searchStr);
+      } else {
+        setObsUsersList([]);
+      }
+    },
   };
 
   const handleInputBlurFns = {
@@ -54,6 +68,9 @@ const SearchResults = () => {
     },
     places: () => {
       setTimeout(() => setPlacesList([]), 500);
+    },
+    obsUsers: () => {
+      setTimeout(() => setObsUsersList([]), 500);
     },
   };
 
@@ -78,6 +95,17 @@ const SearchResults = () => {
         setExcludedPlaces([...excludedPlaces, selectedPlace]);
         setPlacesList([]);
         setTypedValue({...typedValue, place: ''});
+      }
+    },
+    obsUsers: (selectedObsUser, exclude = false) => {
+      if (exclude === false) {
+        setSelectedObsUsers([...selectedObsUsers, selectedObsUser]);
+        setObsUsersList([]);
+        setTypedValue({...typedValue, obsUser: ''});
+      } else {
+        setExcludedObsUsers([...excludedObsUsers, selectedObsUser]);
+        setObsUsersList([]);
+        setTypedValue({...typedValue, obsUser: ''});
       }
     },
   };
@@ -108,6 +136,18 @@ const SearchResults = () => {
         setExcludedPlaces(localExcludedPlaces);
         break;
       }
+      case 'obsUsers': {
+        const localSelectedObsUsers = [...selectedObsUsers];
+        localSelectedObsUsers.splice(index, 1);
+        setSelectedObsUsers(localSelectedObsUsers);
+        break;
+      }
+      case 'obsUsersExclude': {
+        const localExcludedObsUsers = [...excludedObsUsers];
+        localExcludedObsUsers.splice(index, 1);
+        setExcludedObsUsers(localExcludedObsUsers);
+        break;
+      }
       default:
     } 
   };
@@ -133,6 +173,16 @@ const SearchResults = () => {
   }, [placesMatch]);
 
   useEffect(() => {
+    async function fetchAPI() {
+      const res = await axios.get(`${INAT_API_URL}/users/autocomplete?q=${obsUsersMatch}`)
+      setObsUsersList(res.data);
+    }
+
+    const timeOutId = setTimeout(() => fetchAPI(), 500);
+    return () => clearTimeout(timeOutId);
+  }, [obsUsersMatch]);
+
+  useEffect(() => {
     const makeTaxaQuery = () => {
       const queryObj = {};
       const currTaxonIds = selectedTaxa.map(taxon => taxon.id);
@@ -154,11 +204,23 @@ const SearchResults = () => {
 
       return queryObj;
     }
+    
+    const makeObsUsersQuery = () => {
+      const queryObj = {};
+      const currObsUserIds = selectedObsUsers.map(obsUser => obsUser.id);
+      const currExcludedObsUserIds = excludedObsUsers.map(obsUser => obsUser.id);
+
+      if (currObsUserIds.length > 0) queryObj.user_id = currObsUserIds.join(',');
+      if (currExcludedObsUserIds.length > 0) queryObj.not_user_id = currExcludedObsUserIds.join(',');
+
+      return queryObj;
+    }
 
     async function fetchAPI() {
       const queryObj = {
         ...makeTaxaQuery(),
         ...makePlacesQuery(),
+        ...makeObsUsersQuery(),
       };
       const queryStr = queryString.stringify(queryObj);
       const urlPath = queryStr ? `/observations?${queryStr}` : '/observations';
@@ -169,7 +231,11 @@ const SearchResults = () => {
     }
 
     fetchAPI();
-  }, [selectedTaxa, excludedTaxa, selectedPlaces, excludedPlaces]);
+  }, [
+    selectedTaxa, excludedTaxa,
+    selectedPlaces, excludedPlaces,
+    selectedObsUsers, excludedObsUsers,
+  ]);
 
   useEffect(() => {
     navigate(`/?${query}`); 
@@ -185,6 +251,9 @@ const SearchResults = () => {
           placesList={placesList}
           selectedPlaces={selectedPlaces}
           excludedPlaces={excludedPlaces}
+          obsUsersList={obsUsersList}
+          selectedObsUsers={selectedObsUsers}
+          excludedObsUsers={excludedObsUsers}
           typedValue={typedValue}
           handleInputChangeFns={handleInputChangeFns}
           handleInputBlurFns={handleInputBlurFns}

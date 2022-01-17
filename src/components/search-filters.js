@@ -1,5 +1,6 @@
 import TaxaFilter from './filters/taxa';
 import PlacesFilter from './filters/places';
+import ObsUsersFilter from './filters/obs-users';
 
 const SearchFilter = ({
   taxaList,
@@ -8,6 +9,9 @@ const SearchFilter = ({
   placesList,
   selectedPlaces,
   excludedPlaces,
+  obsUsersList,
+  selectedObsUsers,
+  excludedObsUsers,
   typedValue,
   handleInputChangeFns,
   handleInputBlurFns,
@@ -16,8 +20,8 @@ const SearchFilter = ({
 }) => {
   return (
     <form className="pt-6 w-full">
-      <div className="flex flex-wrap -mx-3 mb-6">
-        <div className="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+      <div className="flex flex-wrap -mx-3 mb-1">
+        <div className="w-full md:w-1/2 px-3 mb-2 md:mb-0">
           <TaxaFilter
             taxaList={taxaList}
             selectedTaxa={selectedTaxa}
@@ -38,6 +42,21 @@ const SearchFilter = ({
             handlePlacesChange={handleInputChangeFns.places}
             handlePlacesBlur={handleInputBlurFns.places}
             handleSelectFn={handleSelectFns.places}
+            handleSelectedClick={handleSelectedClick}
+          />
+        </div> 
+      </div>
+
+      <div className="flex flex-wrap -mx-3 mb-1">
+        <div className="w-full md:w-1/2 px-3 mb-2 md:mb-0">
+          <ObsUsersFilter
+            obsUsersList={obsUsersList}
+            selectedObsUsers={selectedObsUsers}
+            excludedObsUsers={excludedObsUsers}
+            typedValue={typedValue.obsUser}
+            handleObsUsersChange={handleInputChangeFns.obsUsers}
+            handleObsUsersBlur={handleInputBlurFns.obsUsers}
+            handleSelectFn={handleSelectFns.obsUsers}
             handleSelectedClick={handleSelectedClick}
           />
         </div> 

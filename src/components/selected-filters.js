@@ -13,7 +13,7 @@ const SelectedFilters = ({
     selectedDisplay = toTitleCase(selectedValue.common);
   } else if (selectedType === 'places' || selectedType === 'placesExclude') {
     selectedDisplay = selectedValue.display;
-  } else if (selectedType === 'users' || selectedType === 'usersExclude' || selectedType === 'identUsers') {
+  } else if (selectedType === 'obsUsers' || selectedType === 'obsUsersExclude' || selectedType === 'identUsers') {
     selectedDisplay = selectedValue.login;
   } else if (selectedType === 'obsTerm') {
     selectedDisplay = selectedValue.name;

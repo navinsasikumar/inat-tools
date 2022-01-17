@@ -15,7 +15,7 @@ const TaxaFilter = ({
   const excludedTaxaLabel = excludedTaxa.length > 0 ? 'Excluded Taxa: ' : '';
 
   return (
-    <div>
+    <div className="h-min max-h-min">
       <input
         type="text"
         placeholder="Taxa"
