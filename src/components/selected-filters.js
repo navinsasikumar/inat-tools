@@ -15,13 +15,13 @@ const SelectedFilters = ({
     selectedDisplay = selectedValue.display;
   } else if (selectedType === 'obsUsers' || selectedType === 'obsUsersExclude' || selectedType === 'identUsers' || selectedType === 'identUsersExclude') {
     selectedDisplay = selectedValue.login;
-  } else if (selectedType === 'obsTerm') {
+  } else if (selectedType === 'obsFields') {
     selectedDisplay = selectedValue.name;
     if (selectedValue.selectedValue) {
-      if (typeof selectedValue === 'object') {
-        selectedDisplay += `=${selectedValue.common}`;
+      if (typeof selectedValue.selectedValue === 'object') {
+        selectedDisplay += `=${selectedValue.selectedValue.common}`;
       } else {
-        selectedDisplay += `=${selectedValue}`;
+        selectedDisplay += `=${selectedValue.selectedValue}`;
       }
     }
   } else if (selectedType === 'annotationTerms' || selectedType === 'annotationTermsExclude') {

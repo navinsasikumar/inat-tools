@@ -44,6 +44,17 @@ const SearchResults = () => {
   const [selectedAnnotationValues, setSelectedAnnotationValues] = useState([]);
   const [excludedAnnotationValues, setExcludedAnnotationValues] = useState([]);
   const [annotationValuesOnFocus, setAnnotationValuesOnFocus] = useState(false);
+
+  const [obsFieldsMatch, setObsFieldsMatch] = useState('');
+  const [obsFieldsList, setObsFieldsList] = useState([]);
+  const [selectedObsFields, setSelectedObsFields] = useState([]);
+  const [excludedObsFields, setExcludedObsFields] = useState([]);
+  const [currObsField, setCurrObsField] = useState('');
+
+  const [obsFieldValuesMatch, setObsFieldValuesMatch] = useState('');
+  const [obsFieldValuesType, setObsFieldValuesType] = useState('');
+  const [obsFieldValuesList, setObsFieldValuesList] = useState([]);
+  const [selectedObsFieldValues, setSelectedObsFieldValues] = useState([]);
   
   const [typedValue, setTypedValue] = useState({
     taxon: '',
@@ -52,6 +63,8 @@ const SearchResults = () => {
     identUser: '',
     annotationTerm: '',
     annotationValue: '',
+    obsField: '',
+    obsFieldValue: '',
   });
 
   const handleInputChangeFns = {
@@ -101,6 +114,32 @@ const SearchResults = () => {
         setAnnotationValuesOnFocus(true);
       }
     },
+    obsFields: (event) => {
+      const searchStr = event.target.value;
+      setTypedValue({...typedValue, obsField: searchStr});
+      if (searchStr.length > 2) {
+        setObsFieldsMatch(searchStr);
+      } else {
+        setObsFieldsList([]);
+      }
+    },
+    obsFieldValues: (event, type) => {
+      const searchStr = event.target.value;
+      setTypedValue({...typedValue, obsFieldValue: searchStr});
+  
+      if (type === 'select') {
+        handleSelectFns.obsFieldValues(searchStr);
+      } else if (type === 'textEnter') {
+        handleSelectFns.obsFieldValues(obsFieldValuesMatch);
+      }
+
+      if (searchStr.length > 2) {
+        setObsFieldValuesMatch(searchStr);
+        setObsFieldValuesType(type);
+      } else {
+        setObsFieldValuesList([]);
+      }
+    },
   };
 
   const handleInputBlurFns = {
@@ -122,6 +161,12 @@ const SearchResults = () => {
     },
     annotationValues: () => {
       setTimeout(() => setAnnotationValuesOnFocus(false), 500);
+    },
+    obsFields: () => {
+      setTimeout(() => setObsFieldsList([]), 500);
+    },
+    obsFieldValues: () => {
+      setTimeout(() => setObsFieldValuesList([]), 500);
     },
   };
 
@@ -201,6 +246,38 @@ const SearchResults = () => {
         setExcludedAnnotationValues([...excludedAnnotationValues, selectedAnnotationValue]);
         setAnnotationValuesList([]);
         setTypedValue({...typedValue, annotationValue: ''});
+      }
+    },
+    obsFields: (selectedObsField, exclude = false) => {
+      if (exclude === false) {
+        if (!selectedObsFields.some(e => e.name === selectedObsField.name)) {
+          setSelectedObsFields([...selectedObsFields, selectedObsField]);
+        } 
+        setObsFieldsList([]);
+        setTypedValue({...typedValue, obsField: ''});
+        setCurrObsField(selectedObsField.name);
+      } else {
+        setExcludedObsFields([...excludedObsFields, selectedObsField]);
+        setObsFieldsList([]);
+        setTypedValue({...typedValue, obsField: ''});
+      }
+      setObsFieldsMatch('');
+    },
+    obsFieldValues: (selectedObsFieldValue, exclude = false) => {
+      if (exclude === false) {
+        setSelectedObsFieldValues([...selectedObsFieldValues, selectedObsFieldValue]);
+        setObsFieldValuesList([]);
+        setTypedValue({...typedValue, obsFieldValue: ''});
+        const localCurrObsFields = selectedObsFields.map(e => {
+          if (e.name === currObsField) {
+            const newObj = {...e};
+            newObj.selectedValue = selectedObsFieldValue;
+            return newObj;
+          }
+          return e;
+        });
+        setSelectedObsFields(localCurrObsFields);
+        setCurrObsField('');
       }
     },
   };
@@ -321,6 +398,18 @@ const SearchResults = () => {
         }
         break;
       }
+      case 'obsFields': {
+        const localSelectedObsFields = [...selectedObsFields];
+        localSelectedObsFields.splice(index, 1);
+        setSelectedObsFields(localSelectedObsFields);
+        break;
+      }
+      case 'obsFieldValues': {
+        const localSelectedObsFieldValues = [...selectedObsFieldValues];
+        localSelectedObsFieldValues.splice(index, 1);
+        setSelectedObsFieldValues(localSelectedObsFieldValues);
+        break;
+      }
       default:
     } 
   };
@@ -375,6 +464,32 @@ const SearchResults = () => {
       fetchAPI();
     }
   }, [annotationTermsMatch]);
+
+  useEffect(() => {
+    async function fetchAPI() {
+      const res = await axios.get(`https://inaturalist.org/observation_fields.json?order_by=values_count&order=desc&per_page=10&q=${obsFieldsMatch}`)
+      setObsFieldsList(res.data && res.data.slice(0, 10));
+    }
+
+    if (obsFieldsMatch.length > 2) {
+      const timeOutId = setTimeout(() => fetchAPI(), 500);
+      return () => clearTimeout(timeOutId);
+    }
+  }, [obsFieldsMatch]);
+
+  useEffect(() => {
+    async function fetchTaxaAPI() {
+      const res = await axios.get(`${INAT_API_URL}/taxa/autocomplete?q=${obsFieldValuesMatch}`)
+      setObsFieldValuesList(res.data);
+    }
+
+    if (obsFieldValuesType === 'taxa') {
+      const timeOutId = setTimeout(() => fetchTaxaAPI(), 500);
+      return () => clearTimeout(timeOutId);
+    } else if (obsFieldValuesType === 'select') {
+      // Nothing to do here; this is handled in the input change function
+    }
+  }, [obsFieldValuesMatch, obsFieldValuesType]);
 
   useEffect(() => {
     const makeTaxaQuery = () => {
@@ -443,6 +558,14 @@ const SearchResults = () => {
       return queryObj;
     }
 
+    const makeObsFieldsQuery = () => {
+      const queryObj = {};
+      selectedObsFields.map(term => ({ field: `field:${term.name}`, value: term.selectedValue }))
+      .forEach((e) => { queryObj[e.field] = (typeof e.value === 'object' ? e.value.id : e.value) || null; });
+
+    return queryObj;
+    }
+
     async function fetchAPI() {
       const queryObj = {
         ...makeTaxaQuery(),
@@ -451,6 +574,7 @@ const SearchResults = () => {
         ...makeIdentUsersQuery(),
         ...makeAnnotationTermsQuery(),
         ...makeAnnotationValuesQuery(),
+        ...makeObsFieldsQuery(),
       };
       const queryStr = queryString.stringify(queryObj);
       const urlPath = queryStr ? `/observations?${queryStr}` : '/observations';
@@ -468,6 +592,7 @@ const SearchResults = () => {
     selectedIdentUsers, excludedIdentUsers,
     selectedAnnotationTerms, excludedAnnotationTerms,
     selectedAnnotationValues, excludedAnnotationValues,
+    selectedObsFields,
   ]);
 
   useEffect(() => {
@@ -497,6 +622,11 @@ const SearchResults = () => {
           selectedAnnotationValues={selectedAnnotationValues}
           excludedAnnotationValues={excludedAnnotationValues}
           annotationValuesOnFocus={annotationValuesOnFocus}
+          obsFieldsList={obsFieldsList}
+          selectedObsFields={selectedObsFields}
+          currObsField={currObsField}
+          obsFieldValuesList={obsFieldValuesList}
+          selectedObsFieldValues={selectedObsFieldValues}
           typedValue={typedValue}
           handleInputChangeFns={handleInputChangeFns}
           handleInputBlurFns={handleInputBlurFns}

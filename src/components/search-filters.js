@@ -3,6 +3,7 @@ import PlacesFilter from './filters/places';
 import ObsUsersFilter from './filters/obs-users';
 import IdentUsersFilter from './filters/ident-users';
 import AnnotationsFilter from './filters/annotations';
+import ObsFieldsFilter from './filters/obs-fields';
 
 const SearchFilter = ({
   taxaList,
@@ -24,6 +25,11 @@ const SearchFilter = ({
   selectedAnnotationValues,
   excludedAnnotationValues,
   annotationValuesOnFocus,
+  obsFieldsList,
+  selectedObsFields,
+  currObsField,
+  obsFieldValuesList,
+  selectedObsFieldValues,
   typedValue,
   handleInputChangeFns,
   handleInputBlurFns,
@@ -108,6 +114,24 @@ const SearchFilter = ({
           />
         </div> 
       
+        <div className="w-full md:w-1/2 px-3 mb-2 md:mb-0">
+          <ObsFieldsFilter
+            obsFieldsList={obsFieldsList}
+            selectedObsFields={selectedObsFields}
+            currObsField={currObsField}
+            typedValue={typedValue.obsField}
+            obsFieldValuesList={obsFieldValuesList}
+            selectedObsFieldValues={selectedObsFieldValues}
+            obsFieldValueTypedValue={typedValue.obsFieldValue}
+            handleObsFieldsChange={handleInputChangeFns.obsFields}
+            handleObsFieldsBlur={handleInputBlurFns.obsFields}
+            handleObsFieldsSelectFn={handleSelectFns.obsFields}
+            handleObsFieldValuesChange={handleInputChangeFns.obsFieldValues}
+            handleObsFieldValuesBlur={handleInputBlurFns.obsFieldValues}
+            handleObsFieldValuesSelectFn={handleSelectFns.obsFieldValues}
+            handleSelectedClick={handleSelectedClick}
+          />
+        </div> 
       </div>
         
     </form>

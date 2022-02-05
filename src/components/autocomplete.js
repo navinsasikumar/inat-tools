@@ -7,7 +7,7 @@ const handleTaxonSelect = (taxon, exclude, handleSelectFn) => {
   handleSelectFn(selectedTaxon, exclude);
 };
 
-const displayTaxa = (matches, handleSelectFn) => {
+const displayTaxa = (matches, handleSelectFn, noExclude = false) => {
   return matches && Array.isArray(matches.results) && matches.results.map(taxon => {
     let photoElem;
     if (taxon.default_photo && taxon.default_photo.square_url) {
@@ -45,14 +45,16 @@ const displayTaxa = (matches, handleSelectFn) => {
                 </div>
               </div>
             </div>
-            <div 
-              className="border-l-[1px] border-gray-300 border-solid text-center hover:text-gray-400"
-              onClick={() => handleTaxonSelect(taxon, true, handleSelectFn)}
-            >
-              <div className="align-middle inline-block leading-10">
-                Exclude
-               </div>
-            </div>
+            {!noExclude && (
+              <div 
+                className="border-l-[1px] border-gray-300 border-solid text-center hover:text-gray-400"
+                onClick={() => handleTaxonSelect(taxon, true, handleSelectFn)}
+              >
+                <div className="align-middle inline-block leading-10">
+                  Exclude
+                 </div>
+              </div>
+            )}
           </div>
         </div>
       </li>
@@ -282,11 +284,41 @@ const displayAnnotationValues = (matches, handleSelectFn) => {
   })
 };
 
-const getMatchesList = (type, matches, handleSelectFn) => {
+const handleObsFieldSelect = (obsField, exclude, handleSelectFn) => {
+  handleSelectFn(obsField, exclude);
+};
+
+const displayObsFields = (matches, handleSelectFn) => {
+  return matches && Array.isArray(matches) && matches.map(obsField => {
+    return (
+      <li key={obsField.id}>
+        <div className="border-[1px] border-gray-800 border-solid p-1">
+          <div className="grid grid-cols-4 p-0">
+            <div
+              className="col-span-4 hover:text-gray-400"
+              onClick={() => handleObsFieldSelect(obsField, false, handleSelectFn)}
+            >
+              <div className="align-middle inline-block pl-2">
+                {obsField.name}
+              </div>
+              <div className="">
+                <div className="align-middle inline-block pl-2">
+                  Type: {obsField.datatype} (Used {obsField.values_count} times)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+    );
+  })
+};
+
+const getMatchesList = (type, matches, handleSelectFn, noExclude) => {
   let matchesList;
   switch(type) {
     case 'taxa':
-      matchesList = displayTaxa(matches, handleSelectFn);
+      matchesList = displayTaxa(matches, handleSelectFn, noExclude);
       break;
     case 'places':
       matchesList = displayPlaces(matches, handleSelectFn);
@@ -303,6 +335,9 @@ const getMatchesList = (type, matches, handleSelectFn) => {
     case 'annotationValues':
       matchesList = displayAnnotationValues(matches, handleSelectFn);
       break;
+    case 'obsFields':
+      matchesList = displayObsFields(matches, handleSelectFn);
+      break;
     default:
       matchesList = '<li></li>';
   }
@@ -313,8 +348,9 @@ const AutoComplete = ({
   type,
   matches,
   handleSelectFn,
+  noExclude,
 }) => {
-  const matchesList = getMatchesList(type, matches, handleSelectFn);
+  const matchesList = getMatchesList(type, matches, handleSelectFn, noExclude);
   return (
     <div className="relative">
       <ul className="absolute bg-slate-900 cursor-pointer pt-1 text-xs text-white -top-2 w-fit max-w-7xl min-w-[100%] z-50">
