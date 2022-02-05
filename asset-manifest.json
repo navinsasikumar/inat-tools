@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/inat-tools/static/css/main.17b7eb28.css",
-    "main.js": "/inat-tools/static/js/main.b75e8208.js",
+    "main.css": "/inat-tools/static/css/main.1d60a6b0.css",
+    "main.js": "/inat-tools/static/js/main.f2f2a392.js",
     "static/js/787.38e3139c.chunk.js": "/inat-tools/static/js/787.38e3139c.chunk.js",
     "static/media/logo.svg": "/inat-tools/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
     "index.html": "/inat-tools/index.html",
-    "main.17b7eb28.css.map": "/inat-tools/static/css/main.17b7eb28.css.map",
-    "main.b75e8208.js.map": "/inat-tools/static/js/main.b75e8208.js.map",
+    "main.1d60a6b0.css.map": "/inat-tools/static/css/main.1d60a6b0.css.map",
+    "main.f2f2a392.js.map": "/inat-tools/static/js/main.f2f2a392.js.map",
     "787.38e3139c.chunk.js.map": "/inat-tools/static/js/787.38e3139c.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.17b7eb28.css",
-    "static/js/main.b75e8208.js"
+    "static/css/main.1d60a6b0.css",
+    "static/js/main.f2f2a392.js"
   ]
 }
