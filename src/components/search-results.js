@@ -563,7 +563,7 @@ const SearchResults = () => {
       selectedObsFields.map(term => ({ field: `field:${term.name}`, value: term.selectedValue }))
       .forEach((e) => { queryObj[e.field] = (typeof e.value === 'object' ? e.value.id : e.value) || null; });
 
-    return queryObj;
+      return queryObj;
     }
 
     async function fetchAPI() {
@@ -596,7 +596,9 @@ const SearchResults = () => {
   ]);
 
   useEffect(() => {
-    navigate(`/?${query}`); 
+    navigate({
+      search: query
+    }); 
   }, [query, navigate]);
 
   return (
