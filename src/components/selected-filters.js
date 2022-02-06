@@ -10,7 +10,7 @@ const SelectedFilters = ({
 
   let selectedDisplay;
   if (selectedType === 'taxa' || selectedType === 'taxaExclude') {
-    selectedDisplay = toTitleCase(selectedValue.common);
+    selectedDisplay = selectedValue.common ? toTitleCase(selectedValue.common) : selectedValue.name;
   } else if (selectedType === 'places' || selectedType === 'placesExclude') {
     selectedDisplay = selectedValue.display;
   } else if (selectedType === 'obsUsers' || selectedType === 'obsUsersExclude' || selectedType === 'identUsers' || selectedType === 'identUsersExclude') {
@@ -19,7 +19,7 @@ const SelectedFilters = ({
     selectedDisplay = selectedValue.name;
     if (selectedValue.selectedValue) {
       if (typeof selectedValue.selectedValue === 'object') {
-        selectedDisplay += `=${selectedValue.selectedValue.common}`;
+        selectedDisplay += `=${selectedValue.selectedValue.common || selectedValue.selectedValue.name}`;
       } else {
         selectedDisplay += `=${selectedValue.selectedValue}`;
       }
