@@ -5,6 +5,7 @@ import queryString from 'query-string';
 import INatLinks from './inat-links';
 import ObservationSquare from './observation-square';
 import SearchFilters from './search-filters';
+import LoadingSpinner from './loading-spinner';
 
 const INAT_API_URL = 'https://api.inaturalist.org/v1';
 
@@ -55,6 +56,8 @@ const SearchResults = () => {
   const [obsFieldValuesType, setObsFieldValuesType] = useState('');
   const [obsFieldValuesList, setObsFieldValuesList] = useState([]);
   const [selectedObsFieldValues, setSelectedObsFieldValues] = useState([]);
+
+  const [loading, setLoading] = useState(true);
   
   const [typedValue, setTypedValue] = useState({
     taxon: '',
@@ -581,7 +584,9 @@ const SearchResults = () => {
       const urlPath = queryStr ? `/observations?${queryStr}` : '/observations';
       setQuery(queryStr);
 
+      setLoading('true');
       const res = await axios.get(`${INAT_API_URL}${urlPath}`);
+      setLoading(false);
       setData(res.data);
     }
 
@@ -605,7 +610,6 @@ const SearchResults = () => {
   }, [query, navigate]);
 
   useEffect(() => {
-
     const makeTaxonObj = taxon => (
       {
         id: taxon.id,
@@ -777,14 +781,23 @@ const SearchResults = () => {
         />
         <INatLinks queryStr={query} totalResults={data.total_results} />
         <div className="w-full lg:flex items-center">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 my-10 mb-2 flex-wrap">
-            {
-              data.results && data.results.map(obs => (
-               <ObservationSquare obs={obs} key={obs.id} />
-              ))
-            }
-          </div>
+          {!loading && (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 my-10 mb-10 flex-wrap">
+              {
+                data.results && data.results.map(obs => (
+                 <ObservationSquare obs={obs} key={obs.id} />
+                ))
+              }
+            </div>
+          )}
         </div>
+        {loading && (
+          <div className="w-full lg:flex items-center">
+            <div className="flex-wrap m-auto mb-10">
+              <LoadingSpinner className="flex-wrap" />
+            </div>
+          </div>
+        )}
       </section>
     </div>
   );
