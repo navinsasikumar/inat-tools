@@ -1,4 +1,4 @@
-const INatLinks = ({queryStr}) => {
+const INatLinks = ({queryStr, totalResults}) => {
   return (
     <div className="p-2 text-center text-white">
       See results on iNaturalist:
@@ -20,6 +20,9 @@ const INatLinks = ({queryStr}) => {
       <div className="p-2 text-xs">
         Some filters may not work for both observations and identifications.
         Any default filters in iNat will still hold if they are not overwritten here.
+      </div>
+      <div className="p-2 text-xs">
+        The below is only a sample of results to verify your query. Visit the iNat links above to see all observations. Total results: {totalResults}
       </div>
     </div>
   );
