@@ -566,6 +566,7 @@ const SearchResults = () => {
       return queryObj;
     }
 
+
     async function fetchAPI() {
       const queryObj = {
         ...makeTaxaQuery(),
@@ -596,10 +597,149 @@ const SearchResults = () => {
   ]);
 
   useEffect(() => {
-    navigate({
-      search: query
-    }); 
+    if (query) {
+      navigate({
+        search: query
+      });
+    }
   }, [query, navigate]);
+
+  useEffect(() => {
+
+    const makeTaxonObj = taxon => (
+      {
+        id: taxon.id,
+        name: taxon.name,
+        common: taxon.preferred_common_name,
+      }
+    );
+
+    const makePlaceObj = place => (
+      {
+        id: place.id,
+        name: place.name,
+        display: place.display_name,
+      }
+    );
+
+    const makeUserObj = user => (
+      {
+        id: user.id,
+        name: user.name,
+        login: user.login,
+      }
+    );
+
+    const makeAnnotationObj = (annotations, idStr) => {
+      const ids = idStr.split(',').map(id => Number(id));
+      if (!annotations.results) return [];
+      return annotations.results.filter(obj => ids.includes(obj.id));
+    };
+
+    const makeAnnotationValuesObj = (annotations, idStr) => {
+      const ids = idStr.split(',').map(id => Number(id));
+      return annotations.filter(obj => ids.includes(obj.id));
+    };
+
+    const makeFlattenedAnnotationValues = (annotations) => {
+      if (!annotations.results) return [];
+      const annotationValuesArr = [];
+      annotations.results
+        .forEach(obj => obj.values.forEach((val) => {
+          const newVal = { ...val };
+          newVal.termId = obj.id;
+          newVal.termLabel = obj.label;
+          annotationValuesArr.push(newVal);
+        }));
+      return annotationValuesArr;
+    };
+
+    async function splitQueryStr(query) {
+      if (query.taxon_ids) {
+        const res = await axios.get(`${INAT_API_URL}/taxa/${query.taxon_ids}`);
+        setSelectedTaxa(res.data.results.map(makeTaxonObj));
+      }
+      if (query.without_taxon_id) {
+        const res = await axios.get(`${INAT_API_URL}/taxa/${query.without_taxon_id}`);
+        setExcludedTaxa(res.data.results.map(makeTaxonObj));
+      }
+
+      if (query.place_id) {
+        const res = await axios.get(`${INAT_API_URL}/places/${query.place_id}`);
+        setSelectedPlaces(res.data.results.map(makePlaceObj));
+      }
+      if (query.not_in_place) {
+        const res = await axios.get(`${INAT_API_URL}/places/${query.not_in_place}`);
+        setExcludedPlaces(res.data.results.map(makePlaceObj));
+      }
+
+      if (query.user_id) {
+        const res = await axios.get(`${INAT_API_URL}/users/${query.user_id}`);
+        setSelectedObsUsers(res.data.results.map(makeUserObj));
+      }
+      if (query.not_user_id) {
+        const res = await axios.get(`${INAT_API_URL}/users/${query.not_user_id}`);
+        setExcludedObsUsers(res.data.results.map(makeUserObj));
+      }
+
+      if (query.ident_user_id) {
+        const res = await axios.get(`${INAT_API_URL}/users/${query.ident_user_id}`);
+        setSelectedIdentUsers(res.data.results.map(makeUserObj));
+      }
+
+      if (query.without_ident_user_id) {
+        const res = await axios.get(`${INAT_API_URL}/users/${query.without_ident_user_id}`);
+        setExcludedIdentUsers(res.data.results.map(makeUserObj));
+      }
+
+      const obsFields = Object.keys(query).filter(key => key.startsWith('field'))
+        .map(e => e.substring('field:'.length));
+      const obsFieldObj  = obsFields.map((e) => {
+        const obj = {
+          name: e,
+        };
+        if (query[`field:${e}`]) {
+          obj.selectedValue = query[`field:${e}`];
+        }
+        return obj;
+      });
+      if (obsFieldObj.length > 0) {
+        setSelectedObsFields(obsFieldObj);
+      }
+
+      if (query.term_id
+        || query.without_term_id
+        || query.term_value_id
+        || query.without_term_value_id
+      ) {
+        const res = await axios.get(`${INAT_API_URL}/controlled_terms`);
+        const flattenedAnnotationValues = makeFlattenedAnnotationValues(res.data);
+        if (query.term_id) {
+          setSelectedAnnotationTerms(makeAnnotationObj(res.data, query.term_id));
+        }
+        if (query.without_term_id) {
+          setExcludedAnnotationTerms(makeAnnotationObj(res.data, query.without_term_id));
+        }
+
+        if (query.term_value_id) {
+          setSelectedAnnotationValues(makeAnnotationValuesObj(
+            flattenedAnnotationValues,
+            query.term_value_id,
+          ));
+        }
+        if (query.without_term_value_id) {
+          setExcludedAnnotationValues(makeAnnotationValuesObj(
+            flattenedAnnotationValues,
+            query.without_term_value_id,
+          ));
+        }
+      }
+    }
+    // Read any existing query string parameters
+    const parsedQuery= queryString.parse(window.location.search);
+    splitQueryStr(parsedQuery);
+
+  }, []);
 
   return (
     <div>
